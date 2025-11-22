@@ -62,11 +62,13 @@ def dot(x, y):
 
 def eucilidean_norm(x):
     """
-    Mathematical formula in pseudocode:
+    Variables: x[vector of n-elements]
 
+    Mathematical formula in pseudocode:
+    
     sumSquare = 0 
     for i = 0 to n:
-        sumSquare = sumSquare + (i*i) 
+        sumSquare = sumSquare + (x[i]*x[i]) 
     
     return np.sqrt(sumSquare)
         

@@ -2,14 +2,6 @@ import numpy as np
 from sentence_transformers import SentenceTransformer
 import torch
 
-model = SentenceTransformer("all-MiniLM-L6-v2")
-
-def embed(text: str) -> np.ndarray:
-    vec = model.encode(text)
-    return vec.astype("float32")
-
-
-
 """
 Author: Trevor Robbins
 File Purpose: Embedding of sentences using 'SentenceTransformer" to vectorize data in backend
@@ -20,6 +12,11 @@ Goals: Understand basic linear algebraeic concepts such as dot products, euclide
 
 """
 
+model = SentenceTransformer("all-MiniLM-L6-v2")
+
+def embed(text) -> torch.tensor:
+    return model.encode(text, convert_to_tensor=True)
+
 
 
 
@@ -28,7 +25,6 @@ sentences = [
     "A neural network is capable of learning patterns."
 ]
 
-embs = model.encode(sentences,convert_to_tensor=True)
 
 
 """testVAL1 = np.random.rand(1024)
@@ -91,6 +87,6 @@ def cosine_sim(x, y):
 
 #print("Shape:", embs.shape)
 #print("First vector (first 5 dims):", embs[0][:])
-print(torch.cosine_similarity(embs[0], embs[1], dim = 0))
+print(torch.cosine_similarity(embed(sentences[0]), embed(sentences[1]), dim = 0))
 
 #print(torch.cuda.is_available())  # True = using GPU

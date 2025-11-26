@@ -92,3 +92,4 @@ def cosine_sim(x, y):
 print(torch.cosine_similarity(embed(sentences[0]), embed(sentences[1]), dim = 0))
 
 #print(torch.cuda.is_available())  # True = using GPU
+

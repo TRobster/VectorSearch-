@@ -1,95 +1,48 @@
-import numpy as np
+﻿import numpy as np
 from sentence_transformers import SentenceTransformer
-import torch
+from typing import List, Union
 
-"""
-Author: Trevor Robbins
-File Purpose: Embedding of sentences using 'SentenceTransformer" to vectorize data in backend
+"""embeddings.py
 
-Goals: Understand basic linear algebraeic concepts such as dot products, euclidean normality, and cosine similarity
-       of two different vectors 
-       
-
+Small, stable wrapper around SentenceTransformer that returns numpy arrays.
+Provides:
+- `model`: the loaded SentenceTransformer instance
+- `embed(texts)`: returns a numpy embedding for a string or list of strings
+- `cosine_sim(a, b)`: cosine similarity between two 1-D numpy vectors
 """
 
 model = SentenceTransformer("all-MiniLM-L6-v2")
 
-def embed(text) -> torch.tensor:
-    return model.encode(text, convert_to_tensor=True)
 
+def embed(texts: Union[str, List[str]]) -> np.ndarray:
+    """Compute embeddings for a single string or a list of strings.
 
+    Args:
+        texts: single string or list of strings
 
-
-sentences = [
-    "A neural network can learn patterns.",
-    "A neural network is capable of learning patterns."
-]
-
-
-
-"""testVAL1 = np.random.rand(1024)
-compare1 = np.random.rand(1024)
-
-testVAL2 = np.random.rand(512)
-compare2 = np.random.rand(512)
-
-testVAL3 = np.random.rand(256)
-compare3 = np.random.rand(256)
-
-testVAL4 = np.random.rand(128)
-compare4 = np.random.rand(128)
-
-x = cosine_sim(testVAL1, compare1)
-y = cosine_sim(testVAL2, compare2)
-z= cosine_sim(testVAL3, compare3)
-g = cosine_sim(testVAL4, compare4)
-
-print(x)
-print(y)
-print(z)
-print(g)
-"""
-
-
-
-
-#def vectorCompare(x, y):
-    
-""""
-def dot(x, y):
-    return np.dot(x, y)
-"""
-
-def eucilidean_norm(x):
+    Returns:
+        If `texts` is a single string, returns a 1-D numpy array (dim,).
+        If `texts` is a list, returns a 2-D numpy array (num_texts, dim).
     """
-    Variables: x[vector of n-elements]
+    single = False
+    if isinstance(texts, str):
+        texts = [texts]
+        single = True
 
-    Mathematical formula in pseudocode:
-    
-    sumSquare = 0 
-    for i = 0 to n:
-        sumSquare = sumSquare + (x[i]*x[i]) 
-    
-    return np.sqrt(sumSquare)
-        
-        
+    embs = model.encode(texts, convert_to_numpy=True)
+    if single:
+        return embs[0]
+    return embs
+
+
+def cosine_sim(a: np.ndarray, b: np.ndarray) -> float:
+    """Return cosine similarity between two 1-D numpy vectors.
+
+    Returns 0.0 when either vector has zero norm.
     """
-    return np.linalg.norm(x)
-
-
-def cosine_sim(x, y):
-    """
-    z = (a * b)/
-        |a|*|b|
-
-    """
-    return np.dot(x, y)/(np.linalg.norm(x) * np.linalg.norm(y))
-
-
-
-#print("Shape:", embs.shape)
-#print("First vector (first 5 dims):", embs[0][:])
-print(torch.cosine_similarity(embed(sentences[0]), embed(sentences[1]), dim = 0))
-
-#print(torch.cuda.is_available())  # True = using GPU
-
+    if a.ndim != 1 or b.ndim != 1:
+        raise ValueError("Inputs must be 1-D numpy arrays")
+    denom = (np.linalg.norm(a) * np.linalg.norm(b))
+    if denom == 0:
+        return 0.0
+    return float(np.dot(a, b) / denom)
